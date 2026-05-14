@@ -1,0 +1,7 @@
+name = "jerrys-music"
+pages_build_output_dir = "src"
+compatibility_date = "2024-09-23"
+
+[[r2_buckets]]
+binding = "MUSIC"
+bucket_name = "jerrys-music"

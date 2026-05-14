@@ -1,0 +1,11 @@
+# Wrangler local state
+.wrangler/
+
+# Local audio files (stored in Cloudflare R2, not git)
+audio-temp/
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
