@@ -35,6 +35,29 @@
       --playing: #c9a84c;
       --radius: 8px;
       --player-h: 96px;
+      --active-bg: rgba(201, 168, 76, 0.12);
+      --active-item-bg: rgba(201, 168, 76, 0.10);
+      --modal-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --banner-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      --modal-primary-color: #0f0f0f;
+    }
+
+    [data-theme="light"] {
+      --bg: #f7f2ea;
+      --surface: #efe9de;
+      --surface2: #e6dfd3;
+      --border: #d4cbbf;
+      --accent: #b8902e;
+      --accent-dim: #9a7825;
+      --text: #1e1b17;
+      --text-dim: #5c5449;
+      --text-muted: #9c9187;
+      --playing: #b8902e;
+      --active-bg: rgba(184, 144, 46, 0.10);
+      --active-item-bg: rgba(184, 144, 46, 0.08);
+      --modal-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      --banner-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --modal-primary-color: #fff;
     }
 
     body {
@@ -80,6 +103,22 @@
     }
     .vinyl-icon.playing { animation-play-state: running; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    .theme-toggle {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 5px 7px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
     /* Main layout */
     .main {
@@ -284,7 +323,7 @@
     .mode-btn.active {
       border-color: var(--accent);
       color: var(--accent);
-      background: rgba(201, 168, 76, 0.12);
+      background: var(--active-bg);
     }
     .mode-btn:hover:not(.active) { border-color: var(--text-dim); color: var(--text-dim); }
 
@@ -326,7 +365,7 @@
       transition: background 0.1s;
     }
     .playlist-item:hover { background: var(--surface); }
-    .playlist-item.active { background: rgba(201, 168, 76, 0.10); }
+    .playlist-item.active { background: var(--active-item-bg); }
     .playlist-item.active .pi-title { color: var(--accent); font-weight: 600; }
     .pi-num {
       width: 20px;
@@ -529,7 +568,7 @@
       padding: 20px 24px;
       min-width: 280px;
       max-width: 360px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: var(--modal-shadow);
     }
     .modal-label {
       font-size: 11px;
@@ -567,7 +606,7 @@
     }
     .modal-btn.primary {
       background: var(--accent);
-      color: #0f0f0f;
+      color: var(--modal-primary-color);
       border-color: var(--accent);
     }
     .modal-btn.primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
@@ -593,7 +632,7 @@
       gap: 16px;
       font-size: 13px;
       color: var(--text-dim);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      box-shadow: var(--banner-shadow);
     }
     #cookie-banner.hidden { display: none !important; }
     #cookie-banner p { flex: 1; line-height: 1.5; }
@@ -643,6 +682,7 @@
 <header>
   <div class="vinyl-icon" id="vinyl"></div>
   <h1>Jerry Richardson<span class="tagline">· Music Archive · 1955 – 2002</span></h1>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Switch theme"></button>
 </header>
 
 <div class="main">
@@ -1316,6 +1356,7 @@ async function setupConsent() {
 
 // --- Init: auto-play from ?play= query param ---
 function init() {
+  initTheme();
   renderLibrary();
   renderPlaylist();
   updatePlayerUI();
@@ -1331,6 +1372,27 @@ function init() {
   }
 
   setupConsent();
+}
+
+// --- Theme toggle ---
+const MOON_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const SUN_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const btn = document.getElementById('theme-toggle');
+  btn.innerHTML = theme === 'dark' ? MOON_SVG : SUN_SVG;
+  btn.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+}
+
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('jerry_theme', next);
+  applyTheme(next);
+}
+
+function initTheme() {
+  applyTheme(localStorage.getItem('jerry_theme') || 'dark');
 }
 
 init();
