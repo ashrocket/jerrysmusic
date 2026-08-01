@@ -9,3 +9,6 @@ audio-temp/
 
 # Node
 node_modules/
+.venv/
+venv/
+__pycache__/
